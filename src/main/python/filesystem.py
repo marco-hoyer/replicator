@@ -6,7 +6,7 @@ Created on 29.07.2013
 
 from system import System
 
-class Filesystem(object):
+class Filesystem():
 
     def __init__(self):
         self.system = System()    
