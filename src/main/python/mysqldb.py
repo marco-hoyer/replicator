@@ -17,7 +17,7 @@ class MysqlDB():
 			self.global_params = ['--defaults-extra-file=/etc/mysql/debian.cnf']
 
 	def dump_database(self, dbname, target_file):
-		params = ['--single-transaction', '--databases', '--single-transaction', '--add-drop-database', dbname, " > %s" % target_file]
+		params = ['--single-transaction', '--databases', '--single-transaction', '--add-drop-database', dbname]
 		self.system.execute(self.mysqldumpcmd, self.global_params + params)
 
 	def get_databases(self):
