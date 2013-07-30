@@ -5,6 +5,7 @@ Created on 29.07.2013
 '''
 from mysqldb import MysqlDB
 from system import System
+from entities import Application
 
 class Actionmanager():
     '''
@@ -21,10 +22,11 @@ class Actionmanager():
 
     
     def replicate(self, app):
-        print "Test"
-        
-    def replicate_database(self, dbname, targethost):
-        dumppath = "/tmp/%s.sql" % dbname
-        self.db.dump_database(dbname, dumppath)
-        self.system.transfer_folder(dumppath, dumppath, targethost)
-        self.db.restore_database_on_targethost(dumppath, targethost)
+        if isinstance(app, Application):
+            for db in app.databases:
+                print "replicating %s" % db
+                self.db.replicate_database(db, app.slave_node)
+            for afile in app.files:
+                print "replicating %s" % afile
+            for folder in app.folders:
+                print "replicating %s" % folder

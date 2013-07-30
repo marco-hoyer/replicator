@@ -5,5 +5,6 @@ config:
   rsync_binary_path: "/usr/bin/rsync"
   mysql_binary_path: "/usr/bin/mysql"
   mysqldump_binary_path: "/usr/bin/mysqldump"
+  mysql_config_file: "/etc/mysql/debian.cnf"
   package_manager: aptitude
   aptitude_binary_path: "/usr/bin/aptitude"

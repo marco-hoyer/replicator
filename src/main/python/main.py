@@ -5,6 +5,7 @@ from system import System
 from config import Config
 from mysqldb import MysqlDB
 from actionmanager import Actionmanager
+from entities import Application
 
 class Main():
 	
@@ -14,5 +15,6 @@ class Main():
 		system = System(app_config)
 		db = MysqlDB(app_config)
 		am = Actionmanager(app_config)
-		#db.dump_database("test", "/tmp/test.sql")
-		am.replicate_database("testdb", "testhost")
+		for element in config.get_applications_list():
+			app = Application(element)
+			am.replicate(app)

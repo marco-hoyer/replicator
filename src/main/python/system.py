@@ -25,7 +25,7 @@ class System():
 	def execute_on_targethost(self, host, command):
 		print host
 		print command
-		params = []
+		params = ['%s@%s' % (self.remote_user,host),command]
 		self.execute("ssh", params)
 	
 	def transfer_single_file(self, source, destination, remote_host):

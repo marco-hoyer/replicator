@@ -30,4 +30,10 @@ class MysqlDB():
 		return None
 	
 	def restore_database_on_targethost(self, source_file, targethost):
-		return None
+		self.system.execute_on_targethost(targethost,"%s %s < %s" % (self.mysqlcmd, self.global_params[0], source_file))
+	
+	def replicate_database(self, dbname, targethost):
+		dumppath = "/tmp/%s.sql" % dbname
+		#self.dump_database(dbname, dumppath)
+		#self.system.transfer_single_file(dumppath, dumppath, targethost)
+		self.restore_database_on_targethost(dumppath, targethost)

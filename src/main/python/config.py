@@ -9,9 +9,9 @@ from yamlparser import YamlParser
 class Config():
 
     def __init__(self):
-        apps_parser = YamlParser("/tmp/applications.yaml")
+        apps_parser = YamlParser("../../../res/applications.yaml")
         self.applications = apps_parser.get("applications")
-        config_parser = YamlParser("/tmp/config.yaml")
+        config_parser = YamlParser("../../../res/config.yaml")
         self.config = config_parser.get("config")
     
     def get_applications_list(self):
