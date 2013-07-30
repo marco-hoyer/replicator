@@ -35,7 +35,11 @@ class MysqlDB():
 		self.system.execute_on_targethost(targethost,"%s %s < %s" % (self.mysqlcmd, self.global_params[0], source_file))
 	
 	def replicate_database(self, dbname, targethost):
-		dumppath = "%s/%s.sql" % (self.temp_path,dbname)
-		self.dump_database(dbname, dumppath)
-		self.system.transfer_single_file(dumppath, dumppath, targethost)
-		self.restore_database_on_targethost(dumppath, targethost)
+		# dumpfile is put in temp with its name being the same as the db name
+		dumpfile = "%s/%s.sql" % (self.temp_path,dbname)
+		# create mysql dump
+		self.dump_database(dbname, dumpfile)
+		# transfer dump to target system
+		self.system.transfer_single_file(dumpfile, self.temp_path, targethost)
+		# trigger remote db restore
+		self.restore_database_on_targethost(dumpfile, targethost)
