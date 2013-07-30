@@ -37,3 +37,12 @@ class Filesystem():
             params = [path]
         self.system.execute("mkdir",params)
         
+    def write_file(self, path, data):
+        fobj = open(path, "w")
+        fobj.write(data)
+        fobj.close()
+        
+    def read_file(self, path):
+        fobj = open(path, "r")
+        return fobj.read()
+        
