@@ -12,7 +12,7 @@ class mysqldb_test (unittest.TestCase):
         self.assertEqual(self.db.get_databases(), None)
             
     def test_dump_database(self):
-        self.assertEqual(self.db.dump_database("testdb","/tmp"), None)
+        self.assertEqual(self.db.dump_database("mysql","/tmp/mysql.sql"), None)
         
     def test_dump_databases(self):
         self.assertEqual(self.db.dump_databases("/tmp"), None)
