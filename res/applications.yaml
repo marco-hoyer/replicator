@@ -1,0 +1,25 @@
+applications:
+- name: "testsite1"
+  url: "http://www.testsite1.web"
+  master_node: www1
+  slave_node: www2
+  files:
+    - "/etc/apache2/sites/available/testsite1"
+  folders:
+    - "/var/www/testsite1/"
+  packages:
+    - apache2
+    - mysql
+    - php5
+- name: "testsite2"
+  url: "http://www.testsite2.web"
+  master_node: www1
+  slave_node: www2
+  files:
+    - "/etc/apache2/sites/available/testsite2"
+  folders:
+    - "/var/www/testsite2/"
+  packages:
+    - apache2
+    - mysql
+    - php5

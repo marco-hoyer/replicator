@@ -1,0 +1,8 @@
+config:
+  remote_user: root
+  ssh_binary_path: "/usr/bin/ssh"
+  scp_binary_path: "/usr/bin/scp"
+  rsync_binary_path: "/usr/bin/rsync"
+  mysql_binary_path: "/usr/bin/mysql"
+  package_manager: aptitude
+  aptitude_binary_path: "/usr/bin/aptitude"
