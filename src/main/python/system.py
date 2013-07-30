@@ -3,7 +3,10 @@ import subprocess
 class System():
 	
 	def __init__(self, config):
-		self.remote_user = config["remote_user"]
+		if config:
+			self.remote_user = config["remote_user"]
+		else:
+			self.remote_user = "root"
 
 	def execute(self, executable, params):
 		if isinstance(params, str):

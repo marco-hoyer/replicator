@@ -5,9 +5,14 @@ from system import System
 class MysqlDB():
 
 	def __init__(self, config):
-		self.system = System(config)
-		self.mysqlcmd = config["mysql_binary_path"]
-		self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
+		if config:
+			self.system = System(config)
+			self.mysqlcmd = config["mysql_binary_path"]
+			self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
+		else:
+			self.system = System(None)
+			self.mysqlcmd = "/usr/bin/mysql"
+			self.global_params = ['--defaults-extra-file=/etc/mysql/debian.cnf']
 
 	def dump_database(self, dbname, target_file):
 		params = ['--databases', '--databases', '--single-transaction', dbname, " > %s" % target_file]

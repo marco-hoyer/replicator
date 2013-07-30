@@ -12,12 +12,13 @@ class Actionmanager():
     '''
 
     def __init__(self, config):
-        
-        self.db = MysqlDB(config)
-        self.system = System(config)
-        '''
-        Constructor
-        '''
+        if config:
+            self.db = MysqlDB(config)
+            self.system = System(config)
+        else:
+            self.db = MysqlDB(None)
+            self.system = System(None)
+
     
     def replicate(self, app):
         print "Test"

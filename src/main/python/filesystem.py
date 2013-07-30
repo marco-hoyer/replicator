@@ -8,8 +8,11 @@ from system import System
 
 class Filesystem():
 
-    def __init__(self):
-        self.system = System()    
+    def __init__(self, config):
+        if config:
+            self.system = System(config)
+        else:
+            self.system = System(None)    
         
     def touch(self, path):
         self.system.execute("touch", [path])

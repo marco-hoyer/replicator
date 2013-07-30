@@ -7,10 +7,6 @@ Created on 29.07.2013
 from yamlparser import YamlParser
 
 class Config():
-    '''
-    classdocs
-    '''
-
 
     def __init__(self):
         apps_parser = YamlParser("/tmp/applications.yaml")

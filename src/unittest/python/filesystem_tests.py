@@ -6,7 +6,7 @@ class syshelper_test (unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(syshelper_test, self).__init__(*args, **kwargs)
-        self.fs = Filesystem()
+        self.fs = Filesystem(None)
 
     def test_fileops(self):
         self.assertEqual(self.fs.touch("/tmp/testfile"), None)

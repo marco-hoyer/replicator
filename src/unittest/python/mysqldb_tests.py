@@ -6,7 +6,7 @@ class mysqldb_test (unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(mysqldb_test, self).__init__(*args, **kwargs)
-        self.db = MysqlDB()
+        self.db = MysqlDB(None)
     
     def test_get_database(self):
         self.assertEqual(self.db.get_databases(), None)
