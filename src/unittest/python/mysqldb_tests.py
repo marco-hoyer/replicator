@@ -17,6 +17,6 @@ class mysqldb_test (unittest.TestCase):
     def test_dump_databases(self):
         self.assertEqual(self.db.dump_databases("/tmp"), None)
     
-    def test_restore_database(self):
-        self.assertEqual(self.db.restore_database("/tmp/testdb.sql"), None)
+    def test_restore_database_on_targethost(self):
+        self.assertEqual(self.db.restore_database_on_targethost("/src/testdb.sql", "localhost"), None)
             

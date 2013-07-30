@@ -17,7 +17,6 @@ class system_test (unittest.TestCase):
 		
 	def test_execute_with_empty_param(self):
 		self.assertEqual(self.system.execute("echo",[]), '\n')
-		self.assertEqual(self.system.execute("pwd",[]), '\n')
 		
 	def test_execute_with_string_param(self):
 		self.assertEqual(self.system.execute("echo","Hallo Welt"), 'Hallo Welt\n')
