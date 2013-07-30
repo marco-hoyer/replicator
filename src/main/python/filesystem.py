@@ -5,14 +5,17 @@ Created on 29.07.2013
 '''
 
 from system import System
+import os.path
 
 class Filesystem():
 
     def __init__(self, config):
         if config:
             self.system = System(config)
+            self.temp_path = config["temp_path"]
         else:
-            self.system = System(None)    
+            self.system = System(None)  
+            self.temp_path = "/tmp/replicator"  
         
     def touch(self, path):
         self.system.execute("touch", [path])
@@ -32,7 +35,7 @@ class Filesystem():
 
     def mkdir(self, path, recursive):
         if recursive:
-            params = ['-rf', path]
+            params = ['-p', path]
         else:
             params = [path]
         self.system.execute("mkdir",params)
@@ -45,4 +48,9 @@ class Filesystem():
     def read_file(self, path):
         fobj = open(path, "r")
         return fobj.read()
+    
+    def prepare_local_temp(self):
+        if os.path.isdir(self.temp_path):
+            self.rm(self.temp_path, True)
+        self.mkdir(self.temp_path, True)
         

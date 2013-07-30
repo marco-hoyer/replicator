@@ -5,8 +5,10 @@ class System():
 	def __init__(self, config):
 		if config:
 			self.remote_user = config["remote_user"]
+			self.temp_path = config["temp_path"]
 		else:
 			self.remote_user = "root"
+			self.temp_path = "/tmp/replicator"
 
 	def execute(self, executable, params):
 		if isinstance(params, str):
@@ -35,7 +37,7 @@ class System():
 	def transfer_folder(self, source, destination, remote_host):
 		params = ['--compress', '--recursive', '--perms', '--owner', '--group', '--times', '--links', '--delete' ,source,"%s@%s:%s" % (self.remote_user, remote_host, destination)]
 		self.execute("rsync", params)
-	
+		
 class ExecutionException(Exception):
 	def __init__(self, value):
 		self.value = value
