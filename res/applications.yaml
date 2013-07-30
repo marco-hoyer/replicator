@@ -3,6 +3,8 @@ applications:
   url: "http://www.testsite1.web"
   master_node: www1
   slave_node: www2
+  databases:
+    - testsite1
   files:
     - "/etc/apache2/sites/available/testsite1"
   folders:
@@ -15,6 +17,8 @@ applications:
   url: "http://www.testsite2.web"
   master_node: www1
   slave_node: www2
+  databases:
+    - testsite2_data
   files:
     - "/etc/apache2/sites/available/testsite2"
   folders:

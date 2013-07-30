@@ -11,7 +11,8 @@ class Application():
 
 
     def __init__(self, app_dict):
-        '''
-        Constructor
-        '''
-        
+        self.url = app_dict["url"]
+        self.files = app_dict["files"]
+        self.folders = app_dict["folders"]
+        self.databases = app_dict["databases"]
+        self.packages = app_dict["packages"]
