@@ -47,8 +47,8 @@ class System():
 			curl.setopt(pycurl.URL, "http://%s" % targethost)
 			curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % url])
 			curl.setopt(pycurl.FOLLOWLOCATION, 1)
-			c.perform()
-			if c.getinfo(pycurl.HTTP_CODE) == "200":
+			curl.perform()
+			if curl.getinfo(pycurl.HTTP_CODE) == "200":
 				return True
 			else:
 				return False
