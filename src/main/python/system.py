@@ -1,4 +1,5 @@
 import subprocess
+import pycurl
 
 class System():
 	
@@ -38,6 +39,13 @@ class System():
 		params = ['--compress', '--recursive', '--perms', '--owner', '--group', '--times', '--links', '--delete' ,source,"%s@%s:%s" % (self.remote_user, remote_host, destination)]
 		self.execute("rsync", params)
 		
+		
+	def test_availability(self, url):
+		if str.startswith('http'):
+			print "testing availability of: %s" % url
+		else:
+			print "not implemented yet"
+
 class ExecutionException(Exception):
 	def __init__(self, value):
 		self.value = value

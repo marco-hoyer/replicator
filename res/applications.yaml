@@ -13,6 +13,8 @@ applications:
     - apache2
     - mysql
     - php5
+  needed_services:
+    - apache2
 - name: "testsite2"
   url: "http://www.testsite2.web"
   master_node: www1
@@ -27,3 +29,5 @@ applications:
     - apache2
     - mysql
     - php5
+  needed_services:
+    - apache2

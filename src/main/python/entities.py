@@ -15,3 +15,4 @@ class Application():
         self.folders = app_dict["folders"]
         self.databases = app_dict["databases"]
         self.packages = app_dict["packages"]
+        self.needed_services = app_dict["needed_services"]
