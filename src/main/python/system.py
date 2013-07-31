@@ -40,9 +40,18 @@ class System():
 		self.execute("rsync", params)
 		
 		
-	def test_availability(self, url):
-		if str.startswith('http'):
+	def test_availability(self, targethost, port, url):
+		if url.startswith('http'):
 			print "testing availability of: %s" % url
+			curl = pycurl.Curl()
+			curl.setopt(pycurl.URL, "http://%s" % targethost)
+			curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % url])
+			curl.setopt(pycurl.FOLLOWLOCATION, 1)
+			c.perform()
+			if c.getinfo(pycurl.HTTP_CODE) == "200":
+				return True
+			else:
+				return False
 		else:
 			print "not implemented yet"
 

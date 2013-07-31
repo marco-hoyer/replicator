@@ -13,8 +13,8 @@ class YamlParser():
         self.data = load(stream, Loader=Loader)
 
     def get(self, head):
+	print self.data[head]
         return self.data[head]
-        pass
 
 
 #output = dump(data, Dumper=Dumper)

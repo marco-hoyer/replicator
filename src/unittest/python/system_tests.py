@@ -20,3 +20,6 @@ class system_test (unittest.TestCase):
 		
 	def test_execute_with_string_param(self):
 		self.assertEqual(self.system.execute("echo","Hallo Welt"), 'Hallo Welt\n')
+
+	def test_test_availability(self):
+		self.assertEqual(self.system.test_availability("127.0.0.1",80), 'testsite1.web')
