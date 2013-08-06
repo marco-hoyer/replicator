@@ -9,3 +9,4 @@ config:
   mysql_config_file: "/etc/mysql/debian.cnf"
   package_manager: aptitude
   aptitude_binary_path: "/usr/bin/aptitude"
+  log_level: DEBUG

@@ -1,10 +1,12 @@
 from local_system import LocalSystem
 from remote_system import RemoteSystem
 from filesystem import Filesystem
+import logging
 
 class MysqlDB():
 
 	def __init__(self, config):
+		self.init_logger()
 		if config:
 			self.localsystem = LocalSystem(config)
 			self.remotesystem = RemoteSystem(config)
@@ -12,6 +14,10 @@ class MysqlDB():
 			self.mysqldumpcmd = config["mysqldump_binary_path"]
 			self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
 			self.temp_path = config["temp_path"]
+
+	def init_logger(self):
+		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
+		self.logger = logging.getLogger('Replicator') 
 
 	def dump_database(self, dbname, target_file):
 		params = ['--single-transaction', '--databases', '--add-drop-database', dbname]

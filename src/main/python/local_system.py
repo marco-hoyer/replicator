@@ -1,21 +1,27 @@
 import subprocess
 import pycurl
 import os
+import logging
 
 class LocalSystem():
 	
 	def __init__(self, config):
+		self.init_logger()
 		if config:
 			self.temp_path = config["temp_path"]
 		else:
 			self.temp_path = "/tmp/replicator/"
+
+	def init_logger(self):
+		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
+		self.logger = logging.getLogger('Replicator')
 
 	def execute(self, executable, params):
 		if isinstance(params, str):
 			params = [params]
 		command = [executable]
 		command.extend(params)
-		print command
+		self.logger.debug("executing: %s" % command)
 		p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		out = p.stdout.read()
 		err = p.stderr.read()

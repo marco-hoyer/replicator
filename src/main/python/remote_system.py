@@ -1,10 +1,13 @@
+from local_system import LocalSystem
 import subprocess
 import pycurl
-from local_system import LocalSystem
+import logging
+import StringIO
 
 class RemoteSystem():
     
     def __init__(self, config):
+        self.init_logger()
         if config:
             self.localsystem = LocalSystem(config)
             self.remote_user = config["remote_user"]
@@ -14,9 +17,16 @@ class RemoteSystem():
             self.remote_user = "root"
             self.temp_path = "/tmp/replicator/"
     
+    def init_logger(self):
+        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
+        self.logger = logging.getLogger('Replicator')   
+    
     def execute(self, targethost, command):
         params = ['%s@%s' % (self.remote_user,targethost),command]
         self.localsystem.execute("ssh", params)
+        
+    def reload_service(self, targethost, service):
+        self.execute(targethost, "/etc/init.d/%s reload" % service)
     
     def transfer_single_file(self, targethost, source, destination):
         params = [source,"%s@%s:%s" % (self.remote_user, targethost, destination)]
@@ -49,12 +59,16 @@ class RemoteSystem():
         
     def test_availability(self, targethost, port, url):
         if url.startswith('http'):
-            print "testing availability of: %s" % url
+            hostheader = url.split('/')[-1]
+            self.logger.debug("testing availability of %s on %s" % (hostheader, targethost))
             curl = pycurl.Curl()
             curl.setopt(pycurl.URL, "http://%s" % targethost)
-            curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % url])
+            curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % hostheader])
             curl.setopt(pycurl.FOLLOWLOCATION, 1)
+            contents = StringIO.StringIO()
+            curl.setopt(pycurl.WRITEFUNCTION, contents.write)
             curl.perform()
+            self.logger.info("server responded with %s" % curl.getinfo(pycurl.HTTP_CODE))
             if curl.getinfo(pycurl.HTTP_CODE) == "200":
                 return True
             else:
