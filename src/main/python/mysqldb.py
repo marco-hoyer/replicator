@@ -1,29 +1,21 @@
-#!/usr/bin/python
-
-from system import System
+from local_system import LocalSystem
+from remote_system import RemoteSystem
 from filesystem import Filesystem
 
 class MysqlDB():
 
 	def __init__(self, config):
 		if config:
-			self.system = System(config)
-			self.fs = Filesystem(config)
+			self.localsystem = LocalSystem(config)
+			self.remotesystem = RemoteSystem(config)
 			self.mysqlcmd = config["mysql_binary_path"]
 			self.mysqldumpcmd = config["mysqldump_binary_path"]
 			self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
 			self.temp_path = config["temp_path"]
-		else:
-			self.system = System(None)
-			self.fs = Filesystem(None)
-			self.mysqlcmd = "/usr/bin/mysql"
-			self.mysqldumpcmd = "/usr/bin/mysqldump"
-			self.global_params = ['--defaults-extra-file=/etc/mysql/debian.cnf']
-			self.temp_path = "/tmp/replicator"
 
 	def dump_database(self, dbname, target_file):
 		params = ['--single-transaction', '--databases', '--add-drop-database', dbname]
-		self.fs.write_file(target_file, self.system.execute(self.mysqldumpcmd, self.global_params + params))
+		self.localsystem.write_file(target_file, self.localsystem.execute(self.mysqldumpcmd, self.global_params + params))
 
 	def get_databases(self):
 		return None
@@ -32,7 +24,7 @@ class MysqlDB():
 		return None
 	
 	def restore_database_on_targethost(self, source_file, targethost):
-		self.system.execute_on_targethost(targethost,"%s %s < %s" % (self.mysqlcmd, self.global_params[0], source_file))
+		self.remotesystem.execute(targethost, "%s %s < %s" % (self.mysqlcmd, self.global_params[0], source_file))
 	
 	def replicate_database(self, dbname, targethost):
 		# dumpfile is put in temp with its name being the same as the db name
@@ -40,6 +32,10 @@ class MysqlDB():
 		# create mysql dump
 		self.dump_database(dbname, dumpfile)
 		# transfer dump to target system
-		self.system.transfer_single_file(dumpfile, self.temp_path, targethost)
+		self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
+		# trigger remote db restore
+		self.restore_database_on_targethost(dumpfile, targethost)
+
+		self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
 		# trigger remote db restore
 		self.restore_database_on_targethost(dumpfile, targethost)

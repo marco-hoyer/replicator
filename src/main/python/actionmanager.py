@@ -4,7 +4,8 @@ Created on 29.07.2013
 @author: mhoyer
 '''
 from mysqldb import MysqlDB
-from system import System
+from local_system import LocalSystem
+from remote_system import RemoteSystem
 from entities import Application
 
 class Actionmanager():
@@ -15,20 +16,23 @@ class Actionmanager():
     def __init__(self, config):
         if config:
             self.db = MysqlDB(config)
-            self.system = System(config)
+            self.system = LocalSystem(config)
+            self.remotesystem = RemoteSystem(config)
         else:
-            self.db = MysqlDB(None)
-            self.system = System(None)
+            print "error initializing actionmanager"
     
     def replicate(self, app):
+        # prepare replicator temp folder for the target node
+        self.remotesystem.prepare_temp(app.slave_node)
         if isinstance(app, Application):
-            for db in app.databases:
-                print "replicating %s" % db
-                self.db.replicate_database(db, app.slave_node)
+            for database in app.databases:
+                print "- replicating %s" % database
+                self.db.replicate_database(database, app.slave_node)
             for afile in app.files:
-                print "replicating %s" % afile
-                self.system.transfer_single_file(afile, afile, app.slave_node)
+                print "- replicating %s" % afile
+                self.remotesystem.transfer_single_file(app.slave_node, afile, afile)
             for folder in app.folders:
-                print "replicating %s" % folder
-                self.system.transfer_folder(folder, folder, app.slave_node)
+                print "- replicating %s" % folder
+                self.remotesystem.transfer_folder(app.slave_node, folder, folder)
+            self.remotesystem.install(app.slave_node, app.packages)
                 
