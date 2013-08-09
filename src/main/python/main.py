@@ -7,6 +7,7 @@ from actionmanager import Actionmanager
 from entities import Application
 import logging
 import argparse
+import sys
 
 class Replicator:
 	
@@ -22,10 +23,18 @@ class Replicator:
 		self.logger = logging.getLogger('Replicator')
 	
 	def replicate_applications(self):
+		error = False
 		for element in self.config.get_applications_list():
 			app = Application(element)
 			self.logger.info("replicating %s" % app.name)
-			self.am.replicate(app)
+			if not self.am.replicate(app):
+				error = True
+		if error:
+			self.logger.error("There were errors replicating configured applications")
+			return False
+		else:
+			return True
+				
 	
 if __name__=="__main__":
 	replicator = Replicator()
@@ -34,6 +43,11 @@ if __name__=="__main__":
 	# prepare local system by cleaning temp f.e.
 	replicator.localsystem.prepare_temp()
 	# iterate over apps and do the job
-	replicator.replicate_applications()
+	if replicator.replicate_applications():
+		replicator.logger.info.info("Terminating successfully")
+		sys.exit(0)
+	else:
+		replicator.logger.info("Terminating with errors")
+		sys.exit(1)
 	
 

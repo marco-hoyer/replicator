@@ -59,12 +59,12 @@ class RemoteSystem():
         
     def test_availability(self, targethost, port, url):
         if url.startswith('http'):
-            hostheader = url.split('/')[-1]
+            hostheader = url.split('/')[2]
             self.logger.debug("testing availability of %s on %s" % (hostheader, targethost))
             curl = pycurl.Curl()
             curl.setopt(pycurl.URL, "http://%s" % targethost)
             curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % hostheader])
-            curl.setopt(pycurl.FOLLOWLOCATION, 1)
+            #curl.setopt(pycurl.FOLLOWLOCATION, 1)
             contents = StringIO.StringIO()
             curl.setopt(pycurl.WRITEFUNCTION, contents.write)
             curl.perform()

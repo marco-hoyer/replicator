@@ -26,25 +26,26 @@ class Actionmanager():
         self.logger = logging.getLogger('Replicator')   
 
     def replicate(self, app):
-        # prepare replicator temp folder for the target node
-        self.remotesystem.prepare_temp(app.slave_node)
         if isinstance(app, Application):
+            # prepare replicator temp folder for the target node
+            self.remotesystem.prepare_temp(app.slave_node)
             for database in app.databases:
-                self.logger.debug("- replicating database: %s" % database)
+                self.logger.debug("replicating database: %s" % database)
                 self.db.replicate_database(database, app.slave_node)
             for afile in app.files:
-                self.logger.debug("- replicating file: %s" % afile)
+                self.logger.debug("replicating file: %s" % afile)
                 self.remotesystem.transfer_single_file(app.slave_node, afile, afile)
             for folder in app.folders:
-                self.logger.debug("- replicating folder: %s" % folder)
+                self.logger.debug("replicating folder: %s" % folder)
                 self.remotesystem.transfer_folder(app.slave_node, folder, folder)
             # ensure installation of needed packages
             self.logger.debug("- installing packages: %s" % ', '.join(app.packages))
             self.remotesystem.install(app.slave_node, app.packages)
             # reload needed services
             for service in app.needed_services:
-                self.logger.debug("- reloading service %s on %s" % (service,app.slave_node))
+                self.logger.debug("reloading service %s on %s" % (service,app.slave_node))
                 self.remotesystem.reload_service(app.slave_node, service)
             # test availability
-            self.remotesystem.test_availability(app.slave_node, 80, app.url)
-                
+            return self.remotesystem.test_availability(app.slave_node, 80, app.url)
+        else:
+            return False
