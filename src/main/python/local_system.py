@@ -2,6 +2,7 @@ import subprocess
 import pycurl
 import os
 import logging
+import StringIO
 
 class LocalSystem():
 	
@@ -67,15 +68,25 @@ class LocalSystem():
 			self.rm(self.temp_path, True)
 		self.mkdir(self.temp_path, True)
 
-	def test_availability(self, port, url):
+	def test_availability(self, targethost, port, url):
 		if url.startswith('http'):
-			print "testing availability of: %s" % url
+			hostheader = url.split('/')[2]
+			self.logger.debug("testing availability of %s on %s:%d" % (hostheader, targethost, port))
 			curl = pycurl.Curl()
-			curl.setopt(pycurl.URL, "http://%s" % localhost)
-			curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % url])
-			curl.setopt(pycurl.FOLLOWLOCATION, 1)
-			curl.perform()
-			if curl.getinfo(pycurl.HTTP_CODE) == "200":
+			curl.setopt(pycurl.URL, "http://%s:%d" % (targethost,port))
+			curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % hostheader])
+			curl.setopt(pycurl.CONNECTTIMEOUT, 2)
+			#curl.setopt(pycurl.FOLLOWLOCATION, 1)
+			contents = StringIO.StringIO()
+			curl.setopt(pycurl.WRITEFUNCTION, contents.write)
+			try:
+				curl.perform()
+			except:
+				self.logger.error("Error performing curl query")
+				return False
+			self.logger.info("server responded with %s" % curl.getinfo(pycurl.HTTP_CODE))
+			#self.logger.debug("data received: %s" % contents.getvalue())
+			if curl.getinfo(pycurl.HTTP_CODE) == 200:
 				return True
 			else:
 				return False

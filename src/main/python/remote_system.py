@@ -58,20 +58,4 @@ class RemoteSystem():
         self.mkdir(targethost, self.temp_path, True)
         
     def test_availability(self, targethost, port, url):
-        if url.startswith('http'):
-            hostheader = url.split('/')[2]
-            self.logger.debug("testing availability of %s on %s" % (hostheader, targethost))
-            curl = pycurl.Curl()
-            curl.setopt(pycurl.URL, "http://%s" % targethost)
-            curl.setopt(pycurl.HTTPHEADER, ['Host: %s' % hostheader])
-            #curl.setopt(pycurl.FOLLOWLOCATION, 1)
-            contents = StringIO.StringIO()
-            curl.setopt(pycurl.WRITEFUNCTION, contents.write)
-            curl.perform()
-            self.logger.info("server responded with %s" % curl.getinfo(pycurl.HTTP_CODE))
-            if curl.getinfo(pycurl.HTTP_CODE) == "200":
-                return True
-            else:
-                return False
-        else:
-            print "not implemented yet"
+        return localsystem.test_availability(self, targethost, port, url)

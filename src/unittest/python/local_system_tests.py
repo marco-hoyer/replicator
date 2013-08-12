@@ -22,16 +22,17 @@ class system_test (unittest.TestCase):
 		self.assertEqual(self.system.execute("echo","Hallo Welt"), 'Hallo Welt\n')
 
 	def test_test_availability(self):
-		self.assertEqual(self.system.test_availability("127.0.0.1",80), 'testsite1.web')
+		self.assertTrue(self.system.test_availability("www.google.de",80, "http://www.google.de"), "Website should be available but was testet to be down")
+		self.assertFalse(self.system.test_availability("www.google.de",546, "http://www.google.de"), "Website shouldn't be testet as up")
 
 	def test_fileops(self):
-		self.assertEqual(self.fs.touch("/tmp/testfile"), None)
-		self.assertEqual(self.fs.mv("/tmp/testfile","/tmp/movedtestfile"), None)
-		self.assertEqual(self.fs.cp("/tmp/movedtestfile","/tmp/testfile"), None)
-		self.assertEqual(self.fs.rm("/tmp/testfile", False), None)
-		self.assertEqual(self.fs.rm("/tmp/movedtestfile", False), None)
+		self.assertEqual(self.system.touch("/tmp/testfile"), None)
+		self.assertEqual(self.system.mv("/tmp/testfile","/tmp/movedtestfile"), None)
+		self.assertEqual(self.system.cp("/tmp/movedtestfile","/tmp/testfile"), None)
+		self.assertEqual(self.system.rm("/tmp/testfile", False), None)
+		self.assertEqual(self.system.rm("/tmp/movedtestfile", False), None)
 		
 	def test_write_file(self):
-		self.assertEqual(self.fs.write_file("/tmp/testfile.txt", "Hallo Welt"), None)
-		self.assertEqual(self.fs.read_file("/tmp/testfile.txt"), "Hallo Welt")
-		self.fs.rm("/tmp/testfile.txt", False)
+		self.assertEqual(self.system.write_file("/tmp/testfile.txt", "Hallo Welt"), None)
+		self.assertEqual(self.system.read_file("/tmp/testfile.txt"), "Hallo Welt")
+		self.system.rm("/tmp/testfile.txt", False)

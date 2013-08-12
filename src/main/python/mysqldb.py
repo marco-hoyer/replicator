@@ -14,6 +14,14 @@ class MysqlDB():
 			self.mysqldumpcmd = config["mysqldump_binary_path"]
 			self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
 			self.temp_path = config["temp_path"]
+		else:
+			self.localsystem = LocalSystem(None)
+			self.remotesystem = RemoteSystem(None)
+			self.mysqlcmd = "/usr/bin/mysql"
+			self.mysqldumpcmd = "/usr/bin/mysqldump"
+			self.global_params = "--defaults-extra-file=/etc/mysql/debian.cnf"
+			self.temp_path = "/tmp/replicator"
+			
 
 	def init_logger(self):
 		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
