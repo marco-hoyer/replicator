@@ -19,7 +19,7 @@ class MysqlDB():
 			self.remotesystem = RemoteSystem(None)
 			self.mysqlcmd = "/usr/bin/mysql"
 			self.mysqldumpcmd = "/usr/bin/mysqldump"
-			self.global_params = "--defaults-extra-file=/etc/mysql/debian.cnf"
+			self.global_params = ['--defaults-extra-file=/etc/mysql/debian.cnf']
 			self.temp_path = "/tmp/replicator"
 			
 

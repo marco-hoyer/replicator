@@ -58,4 +58,4 @@ class RemoteSystem():
         self.mkdir(targethost, self.temp_path, True)
         
     def test_availability(self, targethost, port, url):
-        return localsystem.test_availability(self, targethost, port, url)
+        return self.localsystem.test_availability(targethost, port, url)
