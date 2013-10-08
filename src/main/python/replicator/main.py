@@ -18,9 +18,10 @@ class Replicator:
 		self.localsystem = LocalSystem(app_config)
 		self.am = Actionmanager(app_config)
 	
-	def init_logger(self):
+	def init_logger(self, log_level):
 		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
 		self.logger = logging.getLogger('Replicator')
+		self.logger.setLevel(log_level)
 	
 	def replicate_applications(self):
 		error = False
@@ -50,20 +51,35 @@ class Replicator:
 			return False
 		else:
 			return True
-				
 	
-if __name__=="__main__":
+	def main(self, args):
+		replicator = Replicator()
+		
+		if args.debug:
+			replicator.init_logger(logging.DEBUG)
+		else:
+			replicator.init_logger(logging.INFO)
+		
+		if args.replicate:
+			replicator.logger.info("Starting replication of applications")
+			replicator.replicate_applications()
+		elif not args.backup:
+			replicator.logger.info("Starting backup of applications")
+			replicator.backup_applications()
+		else:
+			print "nothing to do"
+			sys.exit(1)
+
+	
+if __name__ == '__main__':
 	replicator = Replicator()
-	# init logger
-	replicator.init_logger()
-	# prepare local system by cleaning temp f.e.
-	replicator.localsystem.prepare_temp()
-	# iterate over apps and do the job
-	if replicator.backup_applications():
-		replicator.logger.info("Terminating successfully")
-		sys.exit(0)
-	else:
-		replicator.logger.info("Terminating with errors")
-		sys.exit(1)
-	
+	# parameter handling
+	parser = argparse.ArgumentParser(description='Instruments backup and replication of applications configured in a yaml config file')
+	parser.add_argument("--debug", help="show debug output", action="store_true")
+	parser.add_argument("--replicate", help="replicate applications", action="store_true")
+	parser.add_argument("--backup", help="backup applications", action="store_true")
+	# parser.add_argument("applications-list", help="hostname", type=str)
+	# parser.add_argument("config", help="port",type=str)
+	args = parser.parse_args()
+	replicator.main(args)
 

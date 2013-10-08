@@ -75,11 +75,14 @@ class Actionmanager():
                 self.logger.debug("saving folder: %s" % folder)
                 self.system.mkdir(util.path_append([file_backup_path, folder]), True)
                 self.system.cp(folder, util.path_append([file_backup_path, folder]), True)
+
+            # write package list
+            self.system.write_package_list(util.path_append([backup_path, "package_list.txt"]))
             
             # save compressed backup of application data
             self.logger.debug("Saving compressed backup to: %s" % self.system.temp_path)
             self.system.compress(backup_path, backup_path + ".tar.gz")
-            self.system.clear_folder(backup_path)
+            #self.system.clear_folder(backup_path)
             return True
         else:
             return False

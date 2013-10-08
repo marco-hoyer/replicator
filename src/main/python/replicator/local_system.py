@@ -76,6 +76,12 @@ class LocalSystem():
 		if os.path.isdir(path):
 			self.rm(path, True)
 		self.mkdir(path, True)
+		
+	def get_raw_package_list(self):
+		return self.execute("dpkg", ["--get-selections"])
+	
+	def write_package_list(self, path):
+		self.write_file(path, self.get_raw_package_list())
 
 	def test_availability(self, targethost, port, url):
 		if url.startswith('http'):
