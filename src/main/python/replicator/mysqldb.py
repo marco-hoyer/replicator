@@ -1,6 +1,5 @@
 from local_system import LocalSystem
 from remote_system import RemoteSystem
-from filesystem import Filesystem
 import logging
 
 class MysqlDB():

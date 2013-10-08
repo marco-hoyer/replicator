@@ -29,8 +29,24 @@ class Replicator:
 			self.logger.info("replicating %s" % app.name)
 			if not self.am.replicate(app):
 				error = True
+			self.logger.info("saving %s" % app.name)
+			if not self.am.backup(app):
+				error = True
 		if error:
 			self.logger.error("There were errors replicating configured applications")
+			return False
+		else:
+			return True
+		
+	def backup_applications(self):
+		error = False
+		for element in self.config.get_applications_list():
+			app = Application(element)
+			self.logger.info("saving %s" % app.name)
+			if not self.am.backup(app):
+				error = True
+		if error:
+			self.logger.error("There were errors backing up configured applications")
 			return False
 		else:
 			return True
@@ -43,8 +59,8 @@ if __name__=="__main__":
 	# prepare local system by cleaning temp f.e.
 	replicator.localsystem.prepare_temp()
 	# iterate over apps and do the job
-	if replicator.replicate_applications():
-		replicator.logger.info.info("Terminating successfully")
+	if replicator.backup_applications():
+		replicator.logger.info("Terminating successfully")
 		sys.exit(0)
 	else:
 		replicator.logger.info("Terminating with errors")

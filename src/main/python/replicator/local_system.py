@@ -37,22 +37,26 @@ class LocalSystem():
 	def mv(self, source, target):
 		self.execute("mv", [source, target])
 	
-	def cp(self, source, target):
-		self.execute("cp", [source, target])
+	def cp(self, source, target, recursive):
+		if recursive:
+			self.execute("cp", ["-r", source, target])
+		else:
+			self.execute("cp", [source, target])
 	
 	def rm(self, path, recursive):
 		if recursive:
-			params = ['-rf', path]
+			self.execute("rm",['-rf', path])
 		else:
-			params = [path]
-		self.execute("rm",params)
+			self.execute("rm",['-f', path])
 
 	def mkdir(self, path, recursive):
 		if recursive:
-			params = ['-p', path]
+			self.execute("mkdir",['-p', path])
 		else:
-			params = [path]
-		self.execute("mkdir",params)
+			self.execute("mkdir",[path])
+			
+	def compress(self, source, target):
+		self.execute("tar",["-cf", target, source])
 		
 	def write_file(self, path, data):
 		fobj = open(path, "w")
@@ -67,6 +71,11 @@ class LocalSystem():
 		if os.path.isdir(self.temp_path):
 			self.rm(self.temp_path, True)
 		self.mkdir(self.temp_path, True)
+		
+	def clear_folder(self, path):
+		if os.path.isdir(path):
+			self.rm(path, True)
+		self.mkdir(path, True)
 
 	def test_availability(self, targethost, port, url):
 		if url.startswith('http'):

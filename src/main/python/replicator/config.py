@@ -12,9 +12,9 @@ class Config():
     def __init__(self):
         self.init_logger()
         self.logger.info("loading configuration")
-        apps_parser = YamlParser("../../../res/applications.yaml")
+        apps_parser = YamlParser("../../../../res/applications.yaml")
         self.applications = apps_parser.get("applications")
-        config_parser = YamlParser("../../../res/config.yaml")
+        config_parser = YamlParser("../../../../res/config.yaml")
         self.config = config_parser.get("config")
     
     def init_logger(self):
