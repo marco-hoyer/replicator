@@ -38,10 +38,20 @@ class Replicator:
 		if args.replicate:
 			logging.getLogger(__name__).info("Starting replication of applications")
 			am.replicate_applications()
-		elif not args.backup:
+		if args.backup:
 			logging.getLogger(__name__).info("Starting backup of applications")
 			am.backup_applications()
-		else:
+			
+		if not args.replicate and not args.backup:
+			print ""
+			print "CONFIG:"
+			print str(config.get_config_list())
+			print ""
+			print "APPLICATIONS:"
+			for application in config.get_applications_list():
+				print "  " + application["name"] + ":"
+				print "    " + str(application)
+				print ""
 			print "nothing to do"
 			sys.exit(1)
 
