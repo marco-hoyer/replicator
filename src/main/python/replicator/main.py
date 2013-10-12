@@ -52,8 +52,8 @@ if __name__ == '__main__':
 	parser.add_argument("--debug", help="show debug output", action="store_true", default=False)
 	parser.add_argument("--replicate", help="replicate applications", action="store_true")
 	parser.add_argument("--backup", help="backup applications", action="store_true")
-	parser.add_argument("applicationslist", help="hostname", type=str, default="applications.yaml")
-	parser.add_argument("config", help="port",type=str, default="config.yaml")
+	parser.add_argument("applicationslist", help="yaml file containing applications definition", type=str, default="applications.yaml")
+	parser.add_argument("config", help="yaml file containing global application config",type=str, default="config.yaml")
 	args = parser.parse_args()
 	replicator.main(args)
 
