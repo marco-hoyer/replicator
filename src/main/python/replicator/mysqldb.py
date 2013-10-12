@@ -5,26 +5,14 @@ import logging
 class MysqlDB():
 
 	def __init__(self, config):
-		self.init_logger()
-		if config:
-			self.localsystem = LocalSystem(config)
-			self.remotesystem = RemoteSystem(config)
-			self.mysqlcmd = config["mysql_binary_path"]
-			self.mysqldumpcmd = config["mysqldump_binary_path"]
-			self.global_params = ['--defaults-extra-file=%s' % config["mysql_config_file"]]
-			self.temp_path = config["temp_path"]
-		else:
-			self.localsystem = LocalSystem(None)
-			self.remotesystem = RemoteSystem(None)
-			self.mysqlcmd = "/usr/bin/mysql"
-			self.mysqldumpcmd = "/usr/bin/mysqldump"
-			self.global_params = ['--defaults-extra-file=/etc/mysql/debian.cnf']
-			self.temp_path = "/tmp/replicator"
-			
-
-	def init_logger(self):
-		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
-		self.logger = logging.getLogger('Replicator') 
+		self.logger = logging.getLogger(__name__)
+		self.config = config.get_config_list()
+		self.localsystem = LocalSystem(config)
+		self.remotesystem = RemoteSystem(config)
+		self.mysqlcmd = self.config["mysql_binary_path"]
+		self.mysqldumpcmd = self.config["mysqldump_binary_path"]
+		self.global_params = ['--defaults-extra-file=%s' % self.config["mysql_config_file"]]
+		self.temp_path = self.config["temp_path"]
 
 	def dump_database(self, dbname, target_file):
 		params = ['--single-transaction', '--databases', '--add-drop-database', dbname]

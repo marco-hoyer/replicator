@@ -7,29 +7,24 @@ import StringIO
 class LocalSystem():
 	
 	def __init__(self, config):
-		self.init_logger()
-		if config:
-			self.temp_path = config["temp_path"]
-		else:
-			self.temp_path = "/tmp/replicator/"
-
-	def init_logger(self):
-		logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
-		self.logger = logging.getLogger('Replicator')
+		self.logger = logging.getLogger(__name__)
+		self.config = config.get_config_list()
+		self.temp_path = self.config["temp_path"]
+		self.backup_path = self.config["backup_path"]
 
 	def execute(self, executable, params):
 		if isinstance(params, str):
 			params = [params]
 		command = [executable]
 		command.extend(params)
-		self.logger.debug("executing: %s" % command)
+		self.logger.debug("executing: %s" % " ".join(command))
 		p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		out = p.stdout.read()
 		err = p.stderr.read()
 		if not p.wait():
 			return out
 		else:
-			raise ExecutionException(err)	
+			return False	
 
 	def touch(self, path):
 		self.execute("touch", [path])
@@ -67,10 +62,12 @@ class LocalSystem():
 		fobj = open(path, "r")
 		return fobj.read()
 	
-	def prepare_temp(self):
-		if os.path.isdir(self.temp_path):
+	def prepare_application_dirs(self):
+		if self.directory_exists(self.temp_path):
 			self.rm(self.temp_path, True)
 		self.mkdir(self.temp_path, True)
+		if not self.directory_exists(self.backup_path):
+			self.mkdir(self.backup_path, True)
 		
 	def clear_folder(self, path):
 		if os.path.isdir(path):
@@ -82,6 +79,12 @@ class LocalSystem():
 	
 	def write_package_list(self, path):
 		self.write_file(path, self.get_raw_package_list())
+		
+	def file_exists(self, path):
+		self.execute("test", ["-e",path])
+		
+	def directory_exists(self, path):
+		self.execute("test", ["-d",path])
 
 	def test_availability(self, targethost, port, url):
 		if url.startswith('http'):
@@ -107,9 +110,3 @@ class LocalSystem():
 				return False
 		else:
 			print "not implemented yet"
-
-class ExecutionException(Exception):
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		return repr(self.value)

@@ -16,15 +16,39 @@ class Actionmanager():
     '''
 
     def __init__(self, config):
-        self.init_logger()
-        if config:
-            self.db = MysqlDB(config)
-            self.system = LocalSystem(config)
-            self.remotesystem = RemoteSystem(config)
+        self.logger = logging.getLogger(__name__)
+        self.config = config.get_config_list()
+        self.app_config = config.get_applications_list()
+        
+        self.db = MysqlDB(config)
+        self.system = LocalSystem(config)
+        self.remotesystem = RemoteSystem(config)
 
-    def init_logger(self):
-        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
-        self.logger = logging.getLogger('Replicator')   
+    def replicate_applications(self):
+        error = False
+        for element in self.app_config:
+            app = Application(element)
+            self.logger.info("replicating %s" % app.name)
+            if not self.replicate(app):
+                error = True
+        if error:
+            self.logger.error("There were errors replicating configured applications")
+            return False
+        else:
+            return True
+        
+    def backup_applications(self):
+        error = False
+        for element in self.app_config:
+            app = Application(element)
+            self.logger.info("saving %s" % app.name)
+            if not self.backup(app):
+                error = True
+        if error:
+            self.logger.error("There were errors backing up configured applications")
+            return False
+        else:
+            return True
 
     def replicate(self, app):
         if isinstance(app, Application):
@@ -54,35 +78,35 @@ class Actionmanager():
     def backup(self, app):
         if isinstance(app, Application):
             # define path
-            backup_path = util.path_append([self.system.temp_path,app.name])
-            db_backup_path = util.path_append([backup_path,"databases"])
-            file_backup_path = util.path_append([backup_path,"files"])
+            temp_path = util.path_append([self.system.temp_path,app.name])
+            db_temp_path = util.path_append([temp_path,"databases"])
+            file_temp_path = util.path_append([temp_path,"files"])
             
             # clear and prepare temp directories
-            self.system.clear_folder(backup_path)
-            self.system.mkdir(db_backup_path, True)
-            self.system.mkdir(file_backup_path, True)
+            self.system.clear_folder(temp_path)
+            self.system.mkdir(db_temp_path, True)
+            self.system.mkdir(file_temp_path, True)
             
             # backup all components of the application
             for database in app.databases:
                 self.logger.debug("saving database: %s" % database)
-                self.db.dump_database(database, util.path_append([db_backup_path ,database + ".sql"]))
+                self.db.dump_database(database, util.path_append([db_temp_path ,database + ".sql"]))
             for afile in app.files:
                 self.logger.debug("saving file: %s" % afile)
-                self.system.mkdir(util.get_folder_from_path( util.path_append([file_backup_path, afile]) ), True)
-                self.system.cp(afile, util.path_append([file_backup_path, afile]), False)
+                self.system.mkdir(util.get_folder_from_path( util.path_append([file_temp_path, afile]) ), True)
+                self.system.cp(afile, util.path_append([file_temp_path, afile]), False)
             for folder in app.folders:
                 self.logger.debug("saving folder: %s" % folder)
-                self.system.mkdir(util.path_append([file_backup_path, folder]), True)
-                self.system.cp(folder, util.path_append([file_backup_path, folder]), True)
+                self.system.mkdir(util.path_append([file_temp_path, folder]), True)
+                self.system.cp(folder, util.path_append([file_temp_path, folder]), True)
 
             # write package list
-            self.system.write_package_list(util.path_append([backup_path, "package_list.txt"]))
+            self.system.write_package_list(util.path_append([temp_path, "package_list.txt"]))
             
             # save compressed backup of application data
             self.logger.debug("Saving compressed backup to: %s" % self.system.temp_path)
-            self.system.compress(backup_path, backup_path + ".tar.gz")
-            #self.system.clear_folder(backup_path)
+            self.system.compress(temp_path, self.system.backup_path + "/" + app.name + ".tar.gz")
+            self.system.rm(temp_path, True)
             return True
         else:
             return False

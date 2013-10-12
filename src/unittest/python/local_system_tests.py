@@ -1,12 +1,14 @@
 import unittest
 
 from local_system import LocalSystem
+from config import Config
 
 class system_test (unittest.TestCase):
 	
 	def __init__(self, *args, **kwargs):
 		super(system_test, self).__init__(*args, **kwargs)
-		self.system = LocalSystem(None)
+		self.config = Config("../../main/python/replicator/config.yaml","../../main/python/replicator/applications.yaml")
+		self.system = LocalSystem(self.config)
 
 	def test_execute_with_single_param(self):
 		self.assertEqual(self.system.execute("which",['python']), '/usr/bin/python\n')

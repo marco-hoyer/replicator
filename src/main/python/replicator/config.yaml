@@ -1,5 +1,6 @@
 config:
-  temp_path: "/tmp/replicator"
+  temp_path: "/tmp/replicator/tmp"
+  backup_path: "/tmp/replicator/backups"
   remote_user: root
   ssh_binary_path: "/usr/bin/ssh"
   scp_binary_path: "/usr/bin/scp"

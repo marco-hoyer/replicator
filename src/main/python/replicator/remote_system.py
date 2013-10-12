@@ -7,19 +7,11 @@ import StringIO
 class RemoteSystem():
     
     def __init__(self, config):
-        self.init_logger()
-        if config:
-            self.localsystem = LocalSystem(config)
-            self.remote_user = config["remote_user"]
-            self.temp_path = config["temp_path"]
-        else:
-            self.localsystem = LocalSystem(None)
-            self.remote_user = "root"
-            self.temp_path = "/tmp/replicator/"
-    
-    def init_logger(self):
-        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
-        self.logger = logging.getLogger('Replicator')   
+        self.logger = logging.getLogger(__name__)
+        self.config = config.get_config_list()
+        self.localsystem = LocalSystem(config)
+        self.remote_user = self.config["remote_user"]
+        self.temp_path =self. config["temp_path"]
     
     def execute(self, targethost, command):
         params = ['%s@%s' % (self.remote_user,targethost),command]
