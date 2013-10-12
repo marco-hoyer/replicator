@@ -7,7 +7,7 @@ class system_test (unittest.TestCase):
 	
 	def __init__(self, *args, **kwargs):
 		super(system_test, self).__init__(*args, **kwargs)
-		self.config = Config("../../main/python/replicator/config.yaml","../../main/python/replicator/applications.yaml")
+		self.config = Config("../../main/python/replicator/config.yaml.example","../../main/python/replicator/applications.yaml.example")
 		self.system = LocalSystem(self.config)
 
 	def test_execute_with_single_param(self):
@@ -28,11 +28,19 @@ class system_test (unittest.TestCase):
 		self.assertFalse(self.system.test_availability("www.google.de",546, "http://www.google.de"), "Website shouldn't be considered up")
 
 	def test_fileops(self):
-		self.assertEqual(self.system.touch("/tmp/testfile"), None)
-		self.assertEqual(self.system.mv("/tmp/testfile","/tmp/movedtestfile"), None)
-		self.assertEqual(self.system.cp("/tmp/movedtestfile","/tmp/testfile", False), None)
-		self.assertEqual(self.system.rm("/tmp/testfile", False), None)
-		self.assertEqual(self.system.rm("/tmp/movedtestfile", False), None)
+		self.assertEqual(self.system.mkdir("/tmp/replicator-test", True), None)
+		self.assertTrue(self.system.directory_exists("/tmp/replicator-test"))
+		self.assertEqual(self.system.touch("/tmp/replicator-test/testfile"), None)
+		self.assertTrue(self.system.file_exists("/tmp/replicator-test/testfile"))
+		self.assertEqual(self.system.mv("/tmp/replicator-test/testfile","/tmp/replicator-test/movedtestfile"), None)
+		self.assertFalse(self.system.file_exists("/tmp/replicator-test/testfile"))
+		self.assertEqual(self.system.cp("/tmp/replicator-test/movedtestfile","/tmp/replicator-test/testfile", False), None)
+		self.assertTrue(self.system.file_exists("/tmp/replicator-test/testfile"))
+		self.assertEqual(self.system.rm("/tmp/replicator-test/testfile", False), None)
+		self.assertFalse(self.system.file_exists("/tmp/replicator-test/testfile"))
+		self.assertEqual(self.system.rm("/tmp/replicator-test/movedtestfile", False), None)
+		self.assertEqual(self.system.rm("/tmp/replicator-test", True), None)
+		self.assertFalse(self.system.directory_exists("/tmp/replicator-test"))
 		
 	def test_write_file(self):
 		self.assertEqual(self.system.write_file("/tmp/testfile.txt", "Hallo Welt"), None)

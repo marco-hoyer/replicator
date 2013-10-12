@@ -3,7 +3,7 @@ import os
 '''
 Created on 07.10.2013
 
-@author: parallels
+@author: mhoyer
 '''
 
 # TODO: check items for spaces and special chars
@@ -11,7 +11,7 @@ Created on 07.10.2013
 def path_append(path_items):
     path = ""
     for item in path_items:
-        if not item.startswith("/"):
+        if not item.startswith("/") and not item.startswith("."):
             path = path + "/"
         path = path + item
     path = os.path.normpath(path)

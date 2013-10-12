@@ -16,7 +16,8 @@ class MysqlDB():
 
 	def dump_database(self, dbname, target_file):
 		params = ['--single-transaction', '--databases', '--add-drop-database', dbname]
-		self.localsystem.write_file(target_file, self.localsystem.execute(self.mysqldumpcmd, self.global_params + params))
+		self.localsystem.execute_with_file_output(self.mysqldumpcmd, self.global_params + params, target_file)
+		# self.localsystem.write_file(target_file, self.localsystem.execute(self.mysqldumpcmd, self.global_params + params))
 
 	def get_databases(self):
 		return None

@@ -104,8 +104,9 @@ class Actionmanager():
             self.system.write_package_list(util.path_append([temp_path, "package_list.txt"]))
             
             # save compressed backup of application data
-            self.logger.debug("Saving compressed backup to: %s" % self.system.temp_path)
-            self.system.compress(temp_path, self.system.backup_path + "/" + app.name + ".tar.gz")
+            backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
+            self.logger.info("Saving compressed backup to: %s" % backup_file)
+            self.system.compress(temp_path, backup_file)
             self.system.rm(temp_path, True)
             return True
         else:
