@@ -3,6 +3,7 @@ import pycurl
 import os
 import logging
 import StringIO
+import util
 
 class LocalSystem():
 	
@@ -43,11 +44,13 @@ class LocalSystem():
 	def execute_with_file_output(self, executable, params, output_file):
 		command = self.build_command(executable, params)
 		self.logger.debug("executing: %s" % " ".join(command) + " (with stdout to " + output_file + ")")
-		with open('output_file', "w") as output:
+		with open(output_file, "w") as output:
 			p = subprocess.Popen(command, stdout=output, stderr=subprocess.PIPE)
-			err = p.stderr.read()
-			if p.wait():
-				raise ExecutionException(err)
+			output.flush()
+		err = p.stderr.read()
+		if p.wait():
+			raise ExecutionException(err)
+
 
 	def touch(self, path):
 		self.execute("touch", [path])
@@ -57,9 +60,9 @@ class LocalSystem():
 	
 	def cp(self, source, target, recursive):
 		if recursive:
-			self.execute("cp", ["-r", source, target])
+			self.execute("cp", ["-r","--preserve=mode,ownership" , source, target])
 		else:
-			self.execute("cp", [source, target])
+			self.execute("cp", ["--preserve=mode,ownership", source, target])
 	
 	def rm(self, path, recursive):
 		if recursive:
@@ -86,16 +89,18 @@ class LocalSystem():
 		return fobj.read()
 	
 	def prepare_application_dirs(self):
-		if self.directory_exists(self.temp_path):
-			self.rm(self.temp_path, True)
-		self.mkdir(self.temp_path, True)
+		if not self.directory_exists(self.temp_path):
+			self.mkdir(self.temp_path, True)
+		self.clear_folder(self.temp_path)
+		
 		if not self.directory_exists(self.backup_path):
 			self.mkdir(self.backup_path, True)
 		
 	def clear_folder(self, path):
 		if self.directory_exists(path):
-			self.rm(path, True)
-		self.mkdir(path, True)
+			self.rm( util.path_append([path,"*"] ), True)
+		else:
+			self.mkdir(path, True)
 		
 	def get_raw_package_list(self):
 		return self.execute("dpkg", ["--get-selections"])

@@ -2,6 +2,8 @@ from local_system import LocalSystem
 from remote_system import RemoteSystem
 import logging
 import util
+import traceback
+import sys
 
 class MysqlDB():
 
@@ -21,6 +23,7 @@ class MysqlDB():
 			self.localsystem.execute_with_file_output(self.mysqldumpcmd, self.global_params + params, target_file)
 		except Exception as e:
 			self.logger.error("Could not dump database " + dbname + ": " + str(e))
+			#traceback.print_exc(file=sys.stdout)
 			raise Exception()
 
 	def get_databases(self):
@@ -48,4 +51,5 @@ class MysqlDB():
 			self.restore_database_on_targethost(dumpfile, targethost)
 		except Exception as e:
 			self.logger.error("Could not replicate database " + dbname + ": " + str(e))
+			#traceback.print_exc(file=sys.stdout)
 			raise Exception()

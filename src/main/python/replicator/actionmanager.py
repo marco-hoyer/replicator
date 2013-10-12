@@ -42,6 +42,7 @@ class Actionmanager():
         try:
             # prepare replicator temp folder for the target node
             self.remotesystem.prepare_temp(app.slave_node)
+            self.system.prepare_application_dirs()
             for database in app.databases:
                 self.logger.debug("replicating database: %s" % database)
                 self.db.replicate_database(database, app.slave_node)
@@ -92,7 +93,7 @@ class Actionmanager():
                 backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
                 self.logger.debug("Saving compressed backup to: %s" % backup_file)
                 self.system.compress(temp_path, backup_file)
-                self.system.rm(temp_path, True)
+                #self.system.prepare_application_dirs()
         except:
             self.logger.error("Stopping after errors")
             raise Exception("Error saving " + app.name) 
