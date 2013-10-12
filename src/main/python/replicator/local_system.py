@@ -46,9 +46,7 @@ class LocalSystem():
 		with open('output_file', "w") as output:
 			p = subprocess.Popen(command, stdout=output, stderr=subprocess.PIPE)
 			err = p.stderr.read()
-			if not p.wait():
-				return True
-			else:
+			if p.wait():
 				raise ExecutionException(err)
 
 	def touch(self, path):

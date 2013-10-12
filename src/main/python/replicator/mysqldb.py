@@ -1,6 +1,7 @@
 from local_system import LocalSystem
 from remote_system import RemoteSystem
 import logging
+import util
 
 class MysqlDB():
 
@@ -16,8 +17,11 @@ class MysqlDB():
 
 	def dump_database(self, dbname, target_file):
 		params = ['--single-transaction', '--databases', '--add-drop-database', dbname]
-		self.localsystem.execute_with_file_output(self.mysqldumpcmd, self.global_params + params, target_file)
-		# self.localsystem.write_file(target_file, self.localsystem.execute(self.mysqldumpcmd, self.global_params + params))
+		try:
+			self.localsystem.execute_with_file_output(self.mysqldumpcmd, self.global_params + params, target_file)
+		except Exception as e:
+			self.logger.error("Could not dump database " + dbname + ": " + str(e))
+			raise Exception()
 
 	def get_databases(self):
 		return None
@@ -30,14 +34,18 @@ class MysqlDB():
 	
 	def replicate_database(self, dbname, targethost):
 		# dumpfile is put in temp with its name being the same as the db name
-		dumpfile = "%s/%s.sql" % (self.temp_path,dbname)
-		# create mysql dump
-		self.dump_database(dbname, dumpfile)
-		# transfer dump to target system
-		self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
-		# trigger remote db restore
-		self.restore_database_on_targethost(dumpfile, targethost)
+		dumpfile = util.path_append([self.temp_path, dbname, ".sql"])
+		try:
+			# create mysql dump
+			self.dump_database(dbname, dumpfile)
+			# transfer dump to target system
+			self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
+			# trigger remote db restore
+			self.restore_database_on_targethost(dumpfile, targethost)
 
-		self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
-		# trigger remote db restore
-		self.restore_database_on_targethost(dumpfile, targethost)
+			self.remotesystem.transfer_single_file(targethost, dumpfile, self.temp_path)
+			# trigger remote db restore
+			self.restore_database_on_targethost(dumpfile, targethost)
+		except Exception as e:
+			self.logger.error("Could not replicate database " + dbname + ": " + str(e))
+			raise Exception()

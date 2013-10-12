@@ -35,12 +35,15 @@ class Replicator:
 		localsystem.prepare_application_dirs()
 		
 		# action management
-		if args.replicate:
-			logging.getLogger(__name__).info("Starting replication of applications")
-			am.replicate_applications()
-		if args.backup:
-			logging.getLogger(__name__).info("Starting backup of applications")
-			am.backup_applications()
+		try:
+			if args.replicate:
+				logging.getLogger(__name__).info("Starting replication of applications")
+				am.replicate_applications()
+			if args.backup:
+				logging.getLogger(__name__).info("Starting backup of applications")
+				am.backup_applications()
+		except:
+			sys.exit(1)
 			
 		if not args.replicate and not args.backup:
 			print ""
@@ -53,13 +56,13 @@ class Replicator:
 				print "    " + str(application)
 				print ""
 			print "nothing to do"
-			sys.exit(1)
+			sys.exit(2)
 
 if __name__ == '__main__':
 	replicator = Replicator()
 	# parameter handling
 	parser = argparse.ArgumentParser(description='Instruments backup and replication of applications configured in a yaml config file')
-	parser.add_argument("--debug", help="show debug output", action="store_true", default=True)
+	parser.add_argument("--debug", help="show debug output", action="store_true", default=False)
 	parser.add_argument("--replicate", help="replicate applications", action="store_true")
 	parser.add_argument("--backup", help="backup applications", action="store_true", default=True)
 	parser.add_argument("--applicationslist", help="yaml file containing applications definition", type=str, default="applications.yaml.example")

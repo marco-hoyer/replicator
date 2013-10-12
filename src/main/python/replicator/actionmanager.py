@@ -25,33 +25,21 @@ class Actionmanager():
         self.remotesystem = RemoteSystem(config)
 
     def replicate_applications(self):
-        error = False
         for element in self.app_config:
             app = Application(element)
             self.logger.info("replicating %s" % app.name)
-            if not self.replicate(app):
-                error = True
-        if error:
-            self.logger.error("There were errors replicating configured applications")
-            return False
-        else:
-            return True
+            self.replicate(app)
+        self.logger.info("Replication completed successfully")
         
     def backup_applications(self):
-        error = False
         for element in self.app_config:
             app = Application(element)
             self.logger.info("saving %s" % app.name)
-            if not self.backup(app):
-                error = True
-        if error:
-            self.logger.error("There were errors backing up configured applications")
-            return False
-        else:
-            return True
+            self.backup(app)
+        self.logger.info("Backup completed successfully")
 
     def replicate(self, app):
-        if isinstance(app, Application):
+        try:
             # prepare replicator temp folder for the target node
             self.remotesystem.prepare_temp(app.slave_node)
             for database in app.databases:
@@ -63,30 +51,27 @@ class Actionmanager():
             for afolder in app.folders:
                 self.logger.debug("replicating folder: %s" % afolder)
                 self.remotesystem.transfer_folder(app.slave_node, afolder, afolder)
-            # ensure installation of needed packages
-            #self.logger.debug("- installing packages: %s" % ', '.join(app.packages))
-            #self.remotesystem.install(app.slave_node, app.packages)
             # reload needed services
             for service in app.needed_services:
                 self.logger.debug("reloading service %s on %s" % (service,app.slave_node))
                 self.remotesystem.reload_service(app.slave_node, service)
             # test availability
             return self.remotesystem.test_availability(app.slave_node, 80, app.url)
-        else:
-            return False
+        except:
+            self.logger.error("Stopping after errors")
+            raise Exception("Error replicating " + app.name) 
         
     def backup(self, app):
-        if isinstance(app, Application):
-            # define path
-            temp_path = util.path_append([self.system.temp_path,app.name])
-            db_temp_path = util.path_append([temp_path,"databases"])
-            file_temp_path = util.path_append([temp_path,"files"])
+        # define path
+        temp_path = util.path_append([self.system.temp_path,app.name])
+        db_temp_path = util.path_append([temp_path,"databases"])
+        file_temp_path = util.path_append([temp_path,"files"])
             
-            # clear and prepare temp directories
-            self.system.clear_folder(temp_path)
-            self.system.mkdir(db_temp_path, True)
-            self.system.mkdir(file_temp_path, True)
-            
+        # clear and prepare temp directories
+        self.system.clear_folder(temp_path)
+        self.system.mkdir(db_temp_path, True)
+        self.system.mkdir(file_temp_path, True)
+        try:
             # backup all components of the application
             for database in app.databases:
                 self.logger.debug("saving database: %s" % database)
@@ -100,15 +85,14 @@ class Actionmanager():
                 self.system.mkdir(util.path_append([file_temp_path, folder]), True)
                 self.system.cp(folder, util.path_append([file_temp_path, folder]), True)
 
-            # write package list
-            self.system.write_package_list(util.path_append([temp_path, "package_list.txt"]))
+                # write package list
+                self.system.write_package_list(util.path_append([temp_path, "package_list.txt"]))
             
-            # save compressed backup of application data
-            backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
-            self.logger.info("Saving compressed backup to: %s" % backup_file)
-            self.system.compress(temp_path, backup_file)
-            self.system.rm(temp_path, True)
-            return True
-        else:
-            return False
-            
+                # save compressed backup of application data
+                backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
+                self.logger.debug("Saving compressed backup to: %s" % backup_file)
+                self.system.compress(temp_path, backup_file)
+                self.system.rm(temp_path, True)
+        except:
+            self.logger.error("Stopping after errors")
+            raise Exception("Error saving " + app.name) 
