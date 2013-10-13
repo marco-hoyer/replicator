@@ -62,9 +62,9 @@ if __name__ == '__main__':
 	replicator = Replicator()
 	# parameter handling
 	parser = argparse.ArgumentParser(description='Instruments backup and replication of applications configured in a yaml config file')
-	parser.add_argument("--debug", help="show debug output", action="store_true", default=True)
+	parser.add_argument("--debug", help="show debug output", action="store_true")
 	parser.add_argument("--replicate", help="replicate applications", action="store_true")
-	parser.add_argument("--backup", help="backup applications", action="store_true", default=True)
+	parser.add_argument("--backup", help="backup applications", action="store_true")
 	parser.add_argument("--applicationslist", help="yaml file containing applications definition", type=str, default="applications.yaml.example")
 	parser.add_argument("--config", help="yaml file containing global application config",type=str, default="config.yaml.example")
 	args = parser.parse_args()

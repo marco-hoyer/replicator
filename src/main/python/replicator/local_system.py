@@ -23,7 +23,7 @@ class LocalSystem():
 	# execute system calls
 	def execute(self, executable, params):
 		command = self.build_command(executable, params)
-		self.logger.debug("executing: %s" % " ".join(command))
+		self.logger.debug("executing - %s" % " ".join(command))
 		p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		out = p.stdout.read()
 		err = p.stderr.read()
@@ -50,7 +50,6 @@ class LocalSystem():
 		err = p.stderr.read()
 		if p.wait():
 			raise ExecutionException(err)
-
 
 	def touch(self, path):
 		self.execute("touch", [path])
@@ -89,10 +88,7 @@ class LocalSystem():
 		return fobj.read()
 	
 	def prepare_application_dirs(self):
-		if not self.directory_exists(self.temp_path):
-			self.mkdir(self.temp_path, True)
 		self.clear_folder(self.temp_path)
-		
 		if not self.directory_exists(self.backup_path):
 			self.mkdir(self.backup_path, True)
 		
@@ -130,14 +126,14 @@ class LocalSystem():
 			except:
 				self.logger.error("Error performing curl query")
 				return False
-			self.logger.info("server responded with %s" % curl.getinfo(pycurl.HTTP_CODE))
-			#self.logger.debug("data received: %s" % contents.getvalue())
-			if curl.getinfo(pycurl.HTTP_CODE) == 200:
-				return True
-			else:
-				return False
+			if not curl.getinfo(pycurl.HTTP_CODE) == 200:
+				self.logger.debug("Request URL: " + url)
+				self.logger.debug("HTTP Host Header: " + hostheader)
+				self.logger.debug("Server responded with HTTP-STATUS: " + str(curl.getinfo(pycurl.HTTP_CODE)))
+				self.logger.error("Availability test for " + hostheader + " on " + targethost + " responded with http-status: " + str(curl.getinfo(pycurl.HTTP_CODE)))
+				raise Exception("Service is unavailable")
 		else:
-			print "not implemented yet"
+			raise Exception("Not implemented yet")
 			
 class ExecutionException(Exception):
 	def __init__(self, value):

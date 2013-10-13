@@ -41,8 +41,9 @@ class Actionmanager():
     def replicate(self, app):
         try:
             # prepare replicator temp folder for the target node
-            self.remotesystem.prepare_temp(app.slave_node)
             self.system.prepare_application_dirs()
+            self.remotesystem.prepare_application_dirs(app.slave_node)
+
             for database in app.databases:
                 self.logger.debug("replicating database: %s" % database)
                 self.db.replicate_database(database, app.slave_node)
@@ -56,22 +57,25 @@ class Actionmanager():
             for service in app.needed_services:
                 self.logger.debug("reloading service %s on %s" % (service,app.slave_node))
                 self.remotesystem.reload_service(app.slave_node, service)
+            self.remotesystem.prepare_application_dirs(app.slave_node)
             # test availability
             return self.remotesystem.test_availability(app.slave_node, 80, app.url)
-        except:
-            self.logger.error("Stopping after errors")
+        except Exception as e:
+            self.logger.error("Stopping after error: " + str(e))
             raise Exception("Error replicating " + app.name) 
         
     def backup(self, app):
         # define path
-        temp_path = util.path_append([self.system.temp_path,app.name])
-        db_temp_path = util.path_append([temp_path,"databases"])
-        file_temp_path = util.path_append([temp_path,"files"])
+        app_temp_path = util.path_append([self.system.temp_path,app.name])
+        db_temp_path = util.path_append([app_temp_path,"databases"])
+        file_temp_path = util.path_append([app_temp_path,"files"])
             
         # clear and prepare temp directories
-        self.system.clear_folder(temp_path)
-        self.system.mkdir(db_temp_path, True)
-        self.system.mkdir(file_temp_path, True)
+        self.system.prepare_application_dirs()
+        self.system.clear_folder(app_temp_path)
+        self.system.clear_folder(db_temp_path)
+        self.system.clear_folder(file_temp_path)
+        
         try:
             # backup all components of the application
             for database in app.databases:
@@ -87,13 +91,13 @@ class Actionmanager():
                 self.system.cp(folder, util.path_append([file_temp_path, folder]), True)
 
                 # write package list
-                self.system.write_package_list(util.path_append([temp_path, "package_list.txt"]))
+                self.system.write_package_list(util.path_append([app_temp_path, "package_list.txt"]))
             
                 # save compressed backup of application data
                 backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
                 self.logger.debug("Saving compressed backup to: %s" % backup_file)
-                self.system.compress(temp_path, backup_file)
-                #self.system.prepare_application_dirs()
-        except:
-            self.logger.error("Stopping after errors")
+                self.system.compress(app_temp_path, backup_file)
+                self.system.rm(app_temp_path, True)
+        except Exception as e:
+            self.logger.error("Stopping after error: " + str(e))
             raise Exception("Error saving " + app.name) 
