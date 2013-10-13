@@ -24,14 +24,15 @@ class Actionmanager():
         self.system = LocalSystem(config)
         self.remotesystem = RemoteSystem(config)
 
-    def replicate_applications(self):
+    def replicate_all(self):
         for element in self.app_config:
             app = Application(element)
-            self.logger.info("replicating %s" % app.name)
-            self.replicate(app)
+            if app.slave_node:
+                self.logger.info("replicating %s" % app.name)
+                self.replicate(app)
         self.logger.info("Replication completed successfully")
         
-    def backup_applications(self):
+    def backup_all(self):
         for element in self.app_config:
             app = Application(element)
             self.logger.info("saving %s" % app.name)

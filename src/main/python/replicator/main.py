@@ -38,10 +38,10 @@ class Replicator:
 		try:
 			if args.replicate:
 				logging.getLogger(__name__).info("Starting replication of applications")
-				am.replicate_applications()
+				am.replicate_all()
 			if args.backup:
 				logging.getLogger(__name__).info("Starting backup of applications")
-				am.backup_applications()
+				am.backup_all()
 		except:
 			sys.exit(1)
 			
