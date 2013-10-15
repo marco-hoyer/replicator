@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 
 from local_system import LocalSystem
@@ -11,7 +10,7 @@ import sys
 class Replicator:
 	
 	def init_logger(self, log_level):
-		logging.basicConfig(format='%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d.%m.%Y %H:%M:%S',level=logging.DEBUG)
+		logging.basicConfig(format='%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d.%m.%Y %H:%M:%S')
 		self.logger = logging.getLogger(__name__)
 		logging.getLogger().setLevel(log_level)
 	
