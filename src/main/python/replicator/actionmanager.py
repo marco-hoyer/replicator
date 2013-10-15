@@ -44,20 +44,23 @@ class Actionmanager():
             # prepare replicator temp folder for the target node
             self.system.prepare_application_dirs()
             self.remotesystem.prepare_application_dirs(app.slave_node)
-
-            for database in app.databases:
-                self.logger.debug("replicating database: %s" % database)
-                self.db.replicate_database(database, app.slave_node)
-            for afile in app.files:
-                self.logger.debug("replicating file: %s" % afile)
-                self.remotesystem.transfer_single_file(app.slave_node, afile, afile)
-            for afolder in app.folders:
-                self.logger.debug("replicating folder: %s" % afolder)
-                self.remotesystem.transfer_folder(app.slave_node, afolder, afolder)
+            if app.databases:
+                for database in app.databases:
+                    self.logger.debug("replicating database: %s" % database)
+                    self.db.replicate_database(database, app.slave_node)
+            if app.files:
+                for afile in app.files:
+                    self.logger.debug("replicating file: %s" % afile)
+                    self.remotesystem.transfer_single_file(app.slave_node, afile, afile)
+            if app.folders:
+                for afolder in app.folders:
+                    self.logger.debug("replicating folder: %s" % afolder)
+                    self.remotesystem.transfer_folder(app.slave_node, afolder, afolder)
             # reload needed services
-            for service in app.needed_services:
-                self.logger.debug("reloading service %s on %s" % (service,app.slave_node))
-                self.remotesystem.reload_service(app.slave_node, service)
+            if app.needed_services:
+                for service in app.needed_services:
+                    self.logger.debug("reloading service %s on %s" % (service,app.slave_node))
+                    self.remotesystem.reload_service(app.slave_node, service)
             self.remotesystem.prepare_application_dirs(app.slave_node)
             # test availability
             return self.remotesystem.test_availability(app.slave_node, 80, app.url)
@@ -79,17 +82,20 @@ class Actionmanager():
         
         try:
             # backup all components of the application
-            for database in app.databases:
-                self.logger.debug("saving database: %s" % database)
-                self.db.dump_database(database, util.path_append([db_temp_path ,database + ".sql"]))
-            for afile in app.files:
-                self.logger.debug("saving file: %s" % afile)
-                self.system.mkdir(util.get_folder_from_path( util.path_append([file_temp_path, afile]) ), True)
-                self.system.cp(afile, util.path_append([file_temp_path, afile]), False)
-            for folder in app.folders:
-                self.logger.debug("saving folder: %s" % folder)
-                self.system.mkdir(util.path_append([file_temp_path, folder]), True)
-                self.system.cp(folder, util.path_append([file_temp_path, folder]), True)
+            if app.databases:
+                for database in app.databases:
+                    self.logger.debug("saving database: %s" % database)
+                    self.db.dump_database(database, util.path_append([db_temp_path ,database + ".sql"]))
+            if app.files:
+                for afile in app.files:
+                    self.logger.debug("saving file: %s" % afile)
+                    self.system.mkdir(util.get_folder_from_path( util.path_append([file_temp_path, afile]) ), True)
+                    self.system.cp(afile, util.path_append([file_temp_path, afile]), False)
+            if app.folders:
+                for folder in app.folders:
+                    self.logger.debug("saving folder: %s" % folder)
+                    self.system.mkdir(util.path_append([file_temp_path, folder]), True)
+                    self.system.cp(folder, util.path_append([file_temp_path, folder]), True)
 
                 # write package list
                 self.system.write_package_list(util.path_append([app_temp_path, "package_list.txt"]))
