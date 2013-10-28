@@ -4,7 +4,6 @@ applications:
   master_node: www1
   slave_node: www3
   databases:
-    - testsite1
   files:
     - "/etc/apache2/sites-available/testsite1"
   folders:

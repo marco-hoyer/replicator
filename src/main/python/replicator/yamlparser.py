@@ -11,8 +11,13 @@ class YamlParser():
 
     def __init__(self, filepath):
         self.logger = logging.getLogger(__name__) 
-        stream = open(filepath, 'r')
-        self.data = load(stream, Loader=Loader)
+        try:
+            stream = open(filepath, 'r')
+            self.data = load(stream, Loader=Loader)
+        except Exception as e:
+            self.logger.error("Error reading yaml file: " + str(e))
+            raise Exception("Config error")
+
 
     def get(self, head):
         self.logger.debug("raw yaml data loaded: \n %s" % self.data[head])

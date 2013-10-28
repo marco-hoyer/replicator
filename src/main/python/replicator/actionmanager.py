@@ -32,11 +32,42 @@ class Actionmanager():
                 self.replicate(app)
         self.logger.info("Replication completed successfully")
         
+    def replicate_single(self, app_name):
+        app = None
+        # iterate over app config and load app object if there is a matching name
+        for item in self.app_config:
+            if item["name"] == app_name:
+                app = Application(item)
+                
+        if app:
+            if app.slave_node:
+                self.replicate(app)
+            else:
+                self.logger.warning("Application has no slave node configured")
+                raise Exception("Configuration Error")
+        else:
+            self.logger.error("No application configured with name: " + app_name)
+            raise Exception("Configuration Error")
+        self.logger.info("Replication completed successfully")
+        
     def backup_all(self):
         for element in self.app_config:
             app = Application(element)
             self.logger.info("saving %s" % app.name)
             self.backup(app)
+        self.logger.info("Backup completed successfully")
+        
+    def backup_single(self, app_name):
+        app = None
+        # iterate over app config and load app object if there is a matching name
+        for item in self.app_config:
+            if item["name"] == app_name:
+                app = Application(item)
+        if app:
+            self.backup(app)
+        else:
+            self.logger.error("No application configured with name: " + app_name)
+            raise Exception("Configuration Error")
         self.logger.info("Backup completed successfully")
 
     def replicate(self, app):
@@ -63,7 +94,8 @@ class Actionmanager():
                     self.remotesystem.reload_service(app.slave_node, service)
             self.remotesystem.prepare_application_dirs(app.slave_node)
             # test availability
-            return self.remotesystem.test_availability(app.slave_node, 80, app.url)
+            if app.url:
+                return self.remotesystem.test_availability(app.slave_node, 80, app.url)
         except Exception as e:
             self.logger.error("Stopping after error: " + str(e))
             raise Exception("Error replicating " + app.name) 
@@ -101,7 +133,7 @@ class Actionmanager():
                 self.system.write_package_list(util.path_append([app_temp_path, "package_list.txt"]))
             
                 # save compressed backup of application data
-                backup_file = util.path_append([self.system.backup_path, app.name, ".tar.gz"])
+                backup_file = util.path_append([self.system.backup_path, app.name + "_" + util.get_timestamp(), ".tar.gz"])
                 self.logger.debug("Saving compressed backup to: %s" % backup_file)
                 self.system.compress(app_temp_path, backup_file)
                 self.system.rm(app_temp_path, True)
