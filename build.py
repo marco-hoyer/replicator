@@ -16,7 +16,7 @@ name = 'replicator'
 license = 'GNU GPL v3'
 summary = 'replicator: a toolsuite replicating nearly every applications data running on linux'
 url = 'https://github.com/marco-hoyer/replicator'
-version = '1.0'
+version = '1.0.1'
 
 default_task = ['publish']
 
