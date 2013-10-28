@@ -56,7 +56,7 @@ class Replicator:
 		except:
 			sys.exit(1)
 			
-		if not args.replicate and not args.backup:
+		if not args.replicate and not args.backup and not args.replicateall and not args.backupall:
 			print ""
 			print "CONFIG:"
 			print str(config.get_config_list())
