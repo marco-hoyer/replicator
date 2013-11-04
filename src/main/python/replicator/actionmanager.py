@@ -75,6 +75,9 @@ class Actionmanager():
             # prepare replicator temp folder for the target node
             self.system.prepare_application_dirs()
             self.remotesystem.prepare_application_dirs(app.slave_node)
+            if app.packages:
+                self.logger.debug("ensuring packages installed: %s" % ', '.join(app.packages))
+                self.remotesystem.install(app.slave_node, app.packages)
             if app.databases:
                 for database in app.databases:
                     self.logger.debug("replicating database: %s" % database)
